@@ -43,6 +43,7 @@ note_on_times = {}
 player = HapticPlayer()
 
 # Function to send haptic feedback
+#def send_haptic_feedback(note, intensity, duration):
 def send_haptic_feedback(note, intensity, duration):
     if any(note in note_to_actuator[f"oct{no_octave}"] for no_octave in range(1,8)):
         no_octave = note // 12 - 1 
@@ -51,7 +52,8 @@ def send_haptic_feedback(note, intensity, duration):
         dot_frame = {
             "Position": "VestBack",
             "DotPoints": dot_points,
-            "DurationMillis": duration
+           # "DurationMillis": duration
+           "DurationMillis": 1000
         }
         player.submit("dotPoint", dot_frame)
 
