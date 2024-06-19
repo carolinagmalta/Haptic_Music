@@ -117,7 +117,6 @@ def main():
     # Replace 'Your MIDI Port Name' with the name of your MIDI port
     midi_port_name = 'LoopBe Internal MIDI 0'
    
-
     # Open the MIDI input port
     with mido.open_input(midi_port_name) as port:
         print(f"Listening on {midi_port_name}...")
