@@ -47,7 +47,7 @@ player = HapticPlayer()
 def send_haptic_feedback(note, intensity, duration):
     if any(note in note_to_actuator[f"oct{no_octave}"] for no_octave in range(1,8)):
         no_octave = note // 12 - 1 
-        intensity = int(intensity * 0.01) #change the intensity value
+        intensity = int(intensity * 0.001) #change the intensity value
         actuators = note_to_actuator[f"oct{no_octave}"][note]
         dot_points = [{"Index": actuator, "Intensity": intensity} for actuator in actuators]
         dot_frame = {
