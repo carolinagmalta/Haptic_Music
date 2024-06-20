@@ -2,7 +2,7 @@ import mido
 from time import sleep, time
 from bhaptics.haptic_player import HapticPlayer
 
-# List of oct and the actuators (replace with your actual mapping)
+# List of oct superior placement
 note_to_actuator = {
     #0
     "oct1" : {
@@ -47,18 +47,20 @@ player = HapticPlayer()
 def send_haptic_feedback(note, intensity, duration):
     if any(note in note_to_actuator[f"oct{no_octave}"] for no_octave in range(1,8)):
         no_octave = note // 12 - 1 
+        intensity = int(intensity * 0.01) #change the intensity value
         actuators = note_to_actuator[f"oct{no_octave}"][note]
         dot_points = [{"Index": actuator, "Intensity": intensity} for actuator in actuators]
         dot_frame = {
             "Position": "VestBack",
             "DotPoints": dot_points,
-           # "DurationMillis": duration
-           "DurationMillis": 1000
+           #"DurationMillis": duration
+            "DurationMillis": 1000
         }
         player.submit("dotPoint", dot_frame)
 
 # Function to handle incoming MIDI messages
 def handle_midi_message(message):
+    global intensity
     if message.type == 'note_on':
         note = message.note
         velocity = message.velocity
@@ -83,10 +85,23 @@ def handle_midi_message(message):
             # Send haptic feedback with calculated duration
             send_haptic_feedback(note, 0, duration)  # Use 0 for intensity for note off
 
+def get_intensity():
+    while True:
+        try:
+            desired_intensity = int(input("Enter desired vibration intensity (0-100): "))
+            if 0 <= desired_intensity <= 100:
+                return desired_intensity
+            else:
+                print("Invalid intensity value. Please enter a number between 0 and 100.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+            
+            
 def main():
     # Use the defined MIDI port name (replace with your actual port name)
     midi_port_name = 'LoopBe Internal MIDI 0'
-
+    global intensity 
+    intensity = get_intensity()
     # Open the MIDI input port
     with mido.open_input(midi_port_name) as port:
         print(f"Listening on {midi_port_name}...")
