@@ -39,46 +39,42 @@ note_to_actuator = {
 player = HapticPlayer()
 
 def send_haptic_feedback(note, duration):
-    """
-    Function to send haptic feedback based on the note and duration.
-    """
-    # Map MIDI note to actuators based on the note and duration
-    actuators = None
-    if 24 <= note <= 35:
-        actuators = note_to_actuator['oct1'][duration].get(note)
-    elif 36 <= note <= 47:
-        actuators = note_to_actuator['oct2'][duration].get(note)
-    elif 48 <= note <= 59:
-        actuators = note_to_actuator['oct3'][duration].get(note)
-    elif 60 <= note <= 71:
-        actuators = note_to_actuator['oct4'][duration].get(note)
-    elif 72 <= note <= 83:
-        actuators = note_to_actuator['oct5'][duration].get(note)
-    
-    if actuators:
-        player.submit_dot("example_dot", "VestFront", actuators, 100, 300)
+    try:
+        # Placeholder for the function that sends haptic feedback
+        print(f"Sending haptic feedback for note {note} with duration {duration}")
+        # Add actual implementation here
+    except Exception as e:
+        print(f"Failed to send haptic feedback: {e}")
+
+def handle_midi_message(msg):
+    print(f"Handling MIDI message: {msg}")  # Confirm message is received
+    # Determine the duration based on MIDI note velocity
+    if msg.velocity > 100:
+        duration = "long"
+    elif msg.velocity > 75:
+        duration = "medium"
+    elif msg.velocity > 50:
+        duration = "short"
+    else:
+        duration = "very short"
+    send_haptic_feedback(msg.note, duration)
 
 def main():
-    input_name = mido.get_input_names()[0]
-    port = mido.open_input(input_name)
+    port_name = mido.get_input_names()[0]
+    port = mido.open_input(port_name)
+    print(f"Listening on MIDI port: {port_name}")
 
     try:
-        while True:
-            for msg in port.iter_pending():
-                if msg.type == 'note_on':
-                    note = msg.note
-                    # Set duration based on MIDI note velocity
-                    if msg.velocity > 100:
-                        duration = "semibreve"
-                    elif msg.velocity > 75:
-                        duration = "minim"
-                    elif msg.velocity > 50:
-                        duration = "crotchet"
-                    else:
-                        duration = "quaver"
-                    send_haptic_feedback(note, duration)
+        for msg in port:
+            if msg.type == 'note_on':
+                handle_midi_message(msg)
     except KeyboardInterrupt:
+        print("Exiting program...")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
         port.close()
+        print("MIDI port closed.")
 
 if __name__ == "__main__":
     main()

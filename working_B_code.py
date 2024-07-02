@@ -8,31 +8,44 @@ from bhaptics.haptic_player import HapticPlayer
 note_to_actuator = {
     #0
     "oct1" : {
-        24: [1,2,3,7], 26: [1,2,7], 28: [1,2,3,6], 29: [1,2,3,6,7], 31: [1,2,6,7], 33: [1,3,6], 35: [1,3,6,7]
+       # 24: [1,2,3,7], 26: [1,2,7], 28: [1,2,3,6], 29: [1,2,3,6,7], 31: [1,2,6,7], 33: [1,3,6], 35: [1,3,6,7]
+        24: [9,10,11,15], 26: [9,10,15], 28: [9,10,11,14], 29: [9,10,11,14,15], 31: [9,10,14,15], 33: [9,11,14], 35: [9,11,14,15]
+
     },
     #2
     "oct2": {
-        36: [1,5,2,3,7], 38: [1,5,2,7], 40: [1,5,2,3,6], 41: [1,5,2,3,6,7], 43: [1,5,2,6,7], 45: [1,5,3,6], 47: [1,5,3,6,7]
+        #36: [1,5,2,3,7], 38: [1,5,2,7], 40: [1,5,2,3,6], 41: [1,5,2,3,6,7], 43: [1,5,2,6,7], 45: [1,5,3,6], 47: [1,5,3,6,7]
+        36: [9,13,10,11,15], 38: [9,13,10,15], 40: [9,13,10,11,14], 41: [9,13,10,11,14,15], 43: [9,13,10,14,15], 45: [9,13,11,14], 47: [9,13,11,14,15]
+
     },
     #3
     "oct3" : {
-        48: [1,5,9,2,3,7], 50: [1,5,9,2,7], 52: [1,5,9,2,3,6], 53: [1,5,9,2,3,6,7], 55: [1,5,9,2,6,7], 57: [1,5,9,3,6], 59: [1,5,9,3,6,7]
+        #48: [1,5,9,2,3,7], 50: [1,5,9,2,7], 52: [1,5,9,2,3,6], 53: [1,5,9,2,3,6,7], 55: [1,5,9,2,6,7], 57: [1,5,9,3,6], 59: [1,5,9,3,6,7]
+        48: [9,13,17,10,11,15], 50: [9,13,17,10,15], 52: [9,13,17,10,11,14], 53: [9,13,17,10,11,14,15], 55: [9,13,17,10,14,15], 57: [9,13,17,11,14], 59: [9,13,17,11,14,15]
+
     },
     #4
     "oct4" : {
-        60: [5,2,3,7], 62: [5,2,7], 64: [5,2,3,6], 65: [5,2,3,6,7], 67: [5,2,6,7], 69: [5,3,6], 71: [5,3,6,7]
+        #60: [5,2,3,7], 62: [5,2,7], 64: [5,2,3,6], 65: [5,2,3,6,7], 67: [5,2,6,7], 69: [5,3,6], 71: [5,3,6,7]
+        60: [13,10,11,15], 62: [13,10,15], 64: [13,10,11,14], 65: [13,10,11,14,15], 67: [13,10,14,15], 69: [13,11,14], 71: [13,3,11,14,15]
+
     },
     #5
     "oct5" : {
-        72: [1,9,2,3,7], 74: [1,9,2,7], 76: [1,9,2,3,6], 77: [1,9,2,3,6,7], 79: [1,9,2,6,7], 81: [1,9,3,6], 83: [1,9,3,6,7]
+        #72: [1,9,2,3,7], 74: [1,9,2,7], 76: [1,9,2,3,6], 77: [1,9,2,3,6,7], 79: [1,9,2,6,7], 81: [1,9,3,6], 83: [1,9,3,6,7]
+        72: [9,17,10,11,15], 74: [1,9,10,15], 76: [9,17,10,11,14], 77: [9,17,10,11,14,15], 79: [9,17,10,14,15], 81: [9,17,11,14], 83: [9,17,11,14,15]
+
     },
     #6
     "oct6" : {
-        84: [5,9,2,3,7], 86: [5,9,2,7], 88: [5,9,2,3,6], 89: [5,9,2,3,6,7], 91: [5,9,2,6,7], 93: [5,9,3,6], 95: [5,9,3,6,7]
+        #84: [5,9,2,3,7], 86: [5,9,2,7], 88: [5,9,2,3,6], 89: [5,9,2,3,6,7], 91: [5,9,2,6,7], 93: [5,9,3,6], 95: [5,9,3,6,7]
+        84: [13,17,10,11,15], 86: [13,17,10,15], 88: [13,17,10,11,14], 89: [13,17,10,11,14,15], 91: [13,1710,14,15], 93: [13,17,11,14], 95: [13,17,11,14,15]
+
     },
     #7
     "oct7" : {
-        96: [9,2,3,7], 98: [9,2,7], 100: [9,2,3,6], 101: [9,2,3,6,7], 103: [9,2,6,7], 105: [9,3,6], 107: [9,3,6,7]
+        #96: [9,2,3,7], 98: [9,2,7], 100: [9,2,3,6], 101: [9,2,3,6,7], 103: [9,2,6,7], 105: [9,3,6], 107: [9,3,6,7]
+        96: [17,10,11,15], 98: [17,10,15], 100: [17,10,11,14], 101: [17,10,11,14,15], 103: [17,10,14,15], 105: [17,11,14], 107: [17,11,14,15]
     }
 }
 
@@ -58,7 +71,6 @@ def send_haptic_feedback(note, intensity, duration):
             "DurationMillis": 1000
         }
         player.submit("dotPoint", dot_frame)
-
 # Function to handle incoming MIDI messages
 def handle_midi_message(message):
     global intensity
@@ -85,29 +97,54 @@ def handle_midi_message(message):
 
             # Send haptic feedback with calculated duration
             send_haptic_feedback(note, 0, duration)  # Use 0 for intensity for note off
-
 def get_intensity():
+    valid_intensities = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     while True:
         try:
             desired_intensity = int(input("Enter desired vibration intensity (0-100): "))
             if 0 <= desired_intensity <= 100:
-                return desired_intensity
+                # Find the closest valid intensity
+                closest_intensity = min(valid_intensities, key=lambda x: abs(x - desired_intensity))
+                return closest_intensity
             else:
                 print("Invalid intensity value. Please enter a number between 0 and 100.")
         except ValueError:
             print("Invalid input. Please enter a number.")
             
-            
 def main():
-    # Use the defined MIDI port name (replace with your actual port name)
     midi_port_name = 'LoopBe Internal MIDI 0'
-    global intensity 
-    intensity = get_intensity()
-    # Open the MIDI input port
+    intensity = get_intensity()  # Get the desired intensity at the start
     with mido.open_input(midi_port_name) as port:
         print(f"Listening on {midi_port_name}...")
         for message in port:
-            handle_midi_message(message)
+            handle_midi_message(message, intensity)  # Call the handle_midi_message function with the message and intensity
 
+def handle_midi_message(message, base_intensity):
+    if message.type == 'note_on':
+        note = message.note
+        velocity = message.velocity
+        print(f"Note On: {note}, Velocity: {velocity}")
+
+        # Convert velocity to a modifier (0-1 scale)
+        velocity_modifier = velocity / 127.0
+
+        # Calculate final intensity by applying the velocity modifier to the base intensity
+        final_intensity = int(base_intensity * velocity_modifier)
+
+        # Store note on time for duration calculation
+        note_on_times[note] = time()
+
+        # Send haptic feedback with the calculated final intensity
+        send_haptic_feedback(note, final_intensity, 0)  # Use 0 for duration initially
+
+    elif message.type == 'note_off':
+        note = message.note
+        if note in note_on_times:
+            duration = int((time() - note_on_times[note]) * 1000)  # Calculate duration in milliseconds
+            del note_on_times[note]  # Remove note from tracking after processing
+            # Send haptic feedback with calculated duration
+            send_haptic_feedback(note, 0, duration)  # Use 0 for intensity for note off
+            
+             
 if __name__ == "__main__":
     main()
