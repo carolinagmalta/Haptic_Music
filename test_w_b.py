@@ -1,8 +1,10 @@
 import mido
+import requests
 from time import sleep, time
+from pythonosc import udp_client
 from bhaptics.haptic_player import HapticPlayer
 
-# List of oct and the actuators (replace with your actual mapping)
+# List of oct superior placement
 note_to_actuator = {
     #0
     "oct1" : {
@@ -35,7 +37,6 @@ note_to_actuator = {
 }
 
 
-
 # Making a dictionary to track note on times
 note_on_times = {}
 
@@ -47,18 +48,20 @@ player = HapticPlayer()
 def send_haptic_feedback(note, intensity, duration):
     if any(note in note_to_actuator[f"oct{no_octave}"] for no_octave in range(1,8)):
         no_octave = note // 12 - 1 
+        intensity = int(intensity * 1) #change the intensity value
         actuators = note_to_actuator[f"oct{no_octave}"][note]
         dot_points = [{"Index": actuator, "Intensity": intensity} for actuator in actuators]
         dot_frame = {
             "Position": "VestBack",
             "DotPoints": dot_points,
-           # "DurationMillis": duration
-           "DurationMillis": 1000
+           #"DurationMillis": duration
+            "DurationMillis": 1000
         }
         player.submit("dotPoint", dot_frame)
 
 # Function to handle incoming MIDI messages
 def handle_midi_message(message):
+    global intensity
     if message.type == 'note_on':
         note = message.note
         velocity = message.velocity
@@ -82,16 +85,54 @@ def handle_midi_message(message):
 
             # Send haptic feedback with calculated duration
             send_haptic_feedback(note, 0, duration)  # Use 0 for intensity for note off
-
+def get_intensity():
+    valid_intensities = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    while True:
+        try:
+            desired_intensity = int(input("Enter desired vibration intensity (0-100): "))
+            if 0 <= desired_intensity <= 100:
+                # Find the closest valid intensity
+                closest_intensity = min(valid_intensities, key=lambda x: abs(x - desired_intensity))
+                return closest_intensity
+            else:
+                print("Invalid intensity value. Please enter a number between 0 and 100.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+            
 def main():
-    # Use the defined MIDI port name (replace with your actual port name)
     midi_port_name = 'LoopBe Internal MIDI 0'
-
-    # Open the MIDI input port
+    intensity = get_intensity()  # Get the desired intensity at the start
     with mido.open_input(midi_port_name) as port:
         print(f"Listening on {midi_port_name}...")
         for message in port:
-            handle_midi_message(message)
+            handle_midi_message(message, intensity)  # Call the handle_midi_message function with the message and intensity
 
+def handle_midi_message(message, base_intensity):
+    if message.type == 'note_on':
+        note = message.note
+        velocity = message.velocity
+        print(f"Note On: {note}, Velocity: {velocity}")
+
+        # Convert velocity to a modifier (0-1 scale)
+        velocity_modifier = velocity / 127.0
+
+        # Calculate final intensity by applying the velocity modifier to the base intensity
+        final_intensity = int(base_intensity * velocity_modifier)
+
+        # Store note on time for duration calculation
+        note_on_times[note] = time()
+
+        # Send haptic feedback with the calculated final intensity
+        send_haptic_feedback(note, final_intensity, 0)  # Use 0 for duration initially
+
+    elif message.type == 'note_off':
+        note = message.note
+        if note in note_on_times:
+            duration = int((time() - note_on_times[note]) * 1000)  # Calculate duration in milliseconds
+            del note_on_times[note]  # Remove note from tracking after processing
+            # Send haptic feedback with calculated duration
+            send_haptic_feedback(note, 0, duration)  # Use 0 for intensity for note off
+            
+             
 if __name__ == "__main__":
     main()

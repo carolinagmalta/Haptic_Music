@@ -1,5 +1,7 @@
 import mido
+import requests
 from time import sleep, time
+from pythonosc import udp_client
 from bhaptics.haptic_player import HapticPlayer
 
 # List of oct superior placement
@@ -35,7 +37,6 @@ note_to_actuator = {
 }
 
 
-
 # Making a dictionary to track note on times
 note_on_times = {}
 
@@ -47,7 +48,7 @@ player = HapticPlayer()
 def send_haptic_feedback(note, intensity, duration):
     if any(note in note_to_actuator[f"oct{no_octave}"] for no_octave in range(1,8)):
         no_octave = note // 12 - 1 
-        intensity = int(intensity * 0.001) #change the intensity value
+        intensity = int(intensity * 1) #change the intensity value
         actuators = note_to_actuator[f"oct{no_octave}"][note]
         dot_points = [{"Index": actuator, "Intensity": intensity} for actuator in actuators]
         dot_frame = {
