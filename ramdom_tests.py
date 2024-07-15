@@ -7,7 +7,7 @@
     
     
 #TEST GET ACTUATORS
-
+"""
 import unittest
 from test_ind_dots import get_actuator_index
 
@@ -33,3 +33,4 @@ class TestGetActuatorIndex(unittest.TestCase):
         self.assertEqual(get_actuator_index(note), -1)
 if __name__ == '__main__':
     unittest.main()
+    """

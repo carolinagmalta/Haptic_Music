@@ -4,18 +4,6 @@ from time import sleep, time
 from pythonosc import udp_client
 from bhaptics.haptic_player import HapticPlayer
 
-"""
-para atualizar o codigo, basta correr o comando:
-`git add *.py`
-depois:
-`git commit -m "mensagem"`
-e por fim:
-`git push origin main`
-e dar a senha da chave ssh
-"""
-
-
-
 # Setup UDP client for OSC communication (if needed)
 client = udp_client.SimpleUDPClient("127.0.0.1", 5005)
 
@@ -72,7 +60,7 @@ for key in note_keys:
         note_to_actuator[key+12*i] = note_to_actuator[key]
 """
 
-#CASO 5 TWO LINE
+#CASO 5 TWO VERICAL LINES
 #"""
 note_to_actuator = {
     0: 12, 2: 8, 4: 4, 5: 0, 7: 15, 9: 11, 11: 7

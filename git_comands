@@ -1,0 +1,7 @@
+para atualizar o codigo, basta correr o comando:
+`git add *.py`
+depois:
+`git commit -m "mensagem"`
+e por fim:
+`git push origin main`
+e dar a senha da chave ssh
