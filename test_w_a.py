@@ -1,6 +1,6 @@
 import mido
 import requests
-from time import sleep
+from time import sleep, time
 from pythonosc import udp_client
 from bhaptics.haptic_player import HapticPlayer
 
@@ -90,6 +90,7 @@ player = HapticPlayer()  # Create an instance of the HapticPlayer class
 def send_haptic_feedback(note, intensity):
     if note in note_to_actuator: #mudar mediante o caso
         actuator = note_to_actuator[note]
+        intensity = int(intensity * 1)
         dot_frame = {
             "Position": "VestBack",
             "DotPoints": [
@@ -101,6 +102,7 @@ def send_haptic_feedback(note, intensity):
 
 # Handle incoming MIDI messages
 def handle_midi_message(message):
+    global intensity
     if message.type == 'note_on':
         note = message.note
         velocity = message.velocity
@@ -111,18 +113,46 @@ def handle_midi_message(message):
         
         # Send haptic feedback
         send_haptic_feedback(note, intensity)
+        
+
+def get_intensity():
+    valid_intensities = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    while True:
+        try:
+            desired_intensity = int(input("Enter desired vibration intensity (0-100): "))
+            if 0 <= desired_intensity <= 100:
+                # Find the closest valid intensity
+                closest_intensity = min(valid_intensities, key=lambda x: abs(x - desired_intensity))
+                return closest_intensity
+            else:
+                print("Invalid intensity value. Please enter a number between 0 and 100.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+
 
 # Main function to listen to MIDI input
 def main():
     # Replace 'Your MIDI Port Name' with the name of your MIDI port
     midi_port_name = 'LoopBe Internal MIDI 0'
-   
-    # Open the MIDI input port
+    intensity = get_intensity()
     with mido.open_input(midi_port_name) as port:
         print(f"Listening on {midi_port_name}...")
         for message in port:
-            print(message)
-            handle_midi_message(message)
+            handle_midi_message(message, intensity)
+
+note_on_times = {}
+
+def handle_midi_message(message, base_intensity):
+    if message.type == 'note_on':
+        note = message.note
+        velocity = message.velocity
+        print(f"Note On: {note}, Velocity: {velocity}")
+        velocity_modifier = velocity / 127.0
+        final_intensity = int(base_intensity * velocity_modifier)
+        intensity = int((velocity / 127.0) * 100)
+        
+        # Send haptic feedback
+        send_haptic_feedback(note, final_intensity)
 
 if __name__ == "__main__":
     main()
