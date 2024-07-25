@@ -70,7 +70,8 @@ def send_haptic_feedback(note, intensity, duration):
            #"DurationMillis": duration
             "DurationMillis": 1000
         }
-        player.submit("dotPoint", dot_frame)
+        player.submit("dotPoint", dot_frame
+                      )
 # Function to handle incoming MIDI messages
 def handle_midi_message(message):
     global intensity
