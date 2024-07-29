@@ -67,14 +67,14 @@ def send_haptic_feedback(note, intensity, duration):
         dot_frame = {
             "Position": "VestBack",
             "DotPoints": dot_points,
-           #"DurationMillis": duration
-            "DurationMillis": 1000
+            "DurationMillis": duration * 10
+            # "DurationMillis": 1000
         }
         player.submit("dotPoint", dot_frame
                       )
 # Function to handle incoming MIDI messages
-def handle_midi_message(message):
-    global intensity
+def handle_midi_message(message, intensity):
+    # global intensity
     if message.type == 'note_on':
         note = message.note
         velocity = message.velocity
@@ -97,7 +97,9 @@ def handle_midi_message(message):
             del note_on_times[note]  # Remove note from tracking after processing
 
             # Send haptic feedback with calculated duration
-            send_haptic_feedback(note, 0, duration)  # Use 0 for intensity for note off
+            send_haptic_feedback(note, 0, 0)  # Use 0 for intensity for note off
+            
+
 def get_intensity():
     valid_intensities = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     while True:
@@ -119,32 +121,6 @@ def main():
         print(f"Listening on {midi_port_name}...")
         for message in port:
             handle_midi_message(message, intensity)  # Call the handle_midi_message function with the message and intensity
-
-def handle_midi_message(message, base_intensity):
-    if message.type == 'note_on':
-        note = message.note
-        velocity = message.velocity
-        print(f"Note On: {note}, Velocity: {velocity}")
-
-        # Convert velocity to a modifier (0-1 scale)
-        velocity_modifier = velocity / 127.0
-
-        # Calculate final intensity by applying the velocity modifier to the base intensity
-        final_intensity = int(base_intensity * velocity_modifier)
-
-        # Store note on time for duration calculation
-        note_on_times[note] = time()
-
-        # Send haptic feedback with the calculated final intensity
-        send_haptic_feedback(note, final_intensity, 0)  # Use 0 for duration initially
-
-    elif message.type == 'note_off':
-        note = message.note
-        if note in note_on_times:
-            duration = int((time() - note_on_times[note]) * 1000)  # Calculate duration in milliseconds
-            del note_on_times[note]  # Remove note from tracking after processing
-            # Send haptic feedback with calculated duration
-            send_haptic_feedback(note, 0, duration)  # Use 0 for intensity for note off
             
              
 if __name__ == "__main__":

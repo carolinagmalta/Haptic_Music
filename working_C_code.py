@@ -52,59 +52,130 @@ note_to_actuator = {
 
 note_on_times = {}
 
-def send_haptic_feedback(note, intensity, duration):
-    if note in note_to_actuator:
-        actuators = note_to_actuator[note]
+note_duration_to_time = {
+    'semibreve': 4000,  # 4 seconds
+    'minim': 2000,      # 2 seconds
+    'crotchet': 1000,   # 1 second
+    'quaver': 500,       # 0.5 seconds
+    "zero":0
+}
+
+def send_haptic_feedback(note, intensity, note_duration):
+    print(f"Sending haptic feedback for {note} with intensity {intensity} based on {note_duration} duration - 1.")
+    octave_key = f"oct{note // 12+1}"
+    print(f"octave_key: {octave_key}")
+        
+
+    if octave_key in note_to_actuator and note in note_to_actuator[octave_key][note_duration]:
+        intensity = int(intensity * 1)  # Adjust the intensity value
+        actuators = note_to_actuator[octave_key][note]
+        duration_ms = note_duration_to_time.get(note_duration, 1000)  # Default to 1 second if not found
         dot_points = [{"Index": actuator, "Intensity": intensity} for actuator in actuators]
         dot_frame = {
             "Position": "VestBack",
             "DotPoints": dot_points,
-            "DurationMillis": duration
+            "DurationMillis": duration_ms  # Fixed duration for now
         }
-        player.submit_dot("dotPoint", dot_frame)
-    else:
-        print(f"No actuators defined for note {note}")
-        
+        print(f"Sending haptic feedback for {note} with intensity {intensity} for {duration_ms}ms based on {note_duration} duration.")
+        player.submit("dotPoint", dot_frame)
+        # Exit the loop after handling the note
+            
+"""        
 def handle_midi_message(message, base_intensity):
+    global intensity
+    velocity = message.velocity
     if message.type == 'note_on':
         note = message.note
-        velocity = message.velocity
-        print(f"Note On: {note}, Velocity: {velocity}")
-
+        if velocity > 100:
+            intensity = base_intensity * 1.25
+            duration = "semibreve"
+        elif velocity > 75:
+            intensity = base_intensity
+            duration = "minim"
+        elif velocity > 50:
+            intensity = base_intensity * 0.75
+            duration = "crotchet"
+        elif velocity > 0:
+            intensity = base_intensity * 0.5
+            duration = "quaver"
+        # Convert velocity to a modifier (0-1 scale)
         velocity_modifier = velocity / 127.0
+        # Calculate final intensity by applying the velocity modifier to the base intensity
         final_intensity = int(base_intensity * velocity_modifier)
-
+        # Store note on time for duration calculation
         note_on_times[note] = time()
+        # Send haptic feedback with the calculated final intensity
         send_haptic_feedback(note, final_intensity, 0)  # Use 0 for duration initially
     elif message.type == 'note_off':
         note = message.note
         if note in note_on_times:
-            duration = int((time() - note_on_times[note]) * 1000)  # Calculate duration in milliseconds
-            del note_on_times[note]  # Remove note from tracking after processing
-            # Send haptic feedback with calculated duration
-            send_haptic_feedback(note, 0, duration)  # Use 0 for intensity for note off
-   
-        
+            duration = int((time() - note_on_times[note]) * 1000) 
+            velocity = message.velocity
+            print(f"Note On: {note}, Velocity: {velocity}")
+            send_haptic_feedback(note, 0, duration) 
+            """
+def handle_midi_message(message, base_intensity):
+    global intensity
+    duration = 0  # Initialize duration to 0
+
+    if message.type == 'note_on':
+        note = message.note
+        velocity = getattr(message, 'velocity', 0)  # Safely get velocity, default to 0 if not present
+
+        if velocity > 100:
+            intensity = base_intensity * 1.25
+            duration = "semibreve"
+        elif velocity > 75:
+            intensity = base_intensity
+            duration = "minim"
+        elif velocity > 50:
+            intensity = base_intensity * 0.75
+            duration = "crotchet"
+        elif velocity > 0:
+            intensity = base_intensity * 0.5
+            duration = "quaver"
+
+        # Convert velocity to a modifier (0-1 scale)
+        velocity_modifier = velocity / 127.0
+        # Calculate final intensity by applying the velocity modifier to the base intensity
+        final_intensity = int(base_intensity * velocity_modifier)
+        # Store note on time for duration calculation
+        note_on_times[note] = time()
+        # Send haptic feedback with the calculated final intensity
+        send_haptic_feedback(note, final_intensity, 0)  # Use 0 for duration initially
+
+    elif message.type == 'note_off':
+        note = message.note
+        if note in note_on_times:
+            duration = int((time() - note_on_times[note]) * 1000)
+            velocity = getattr(message, 'velocity', 0)  # Safely get velocity, default to 0 if not present
+            print(f"Note On: {note}, Velocity: {velocity}")
+            send_haptic_feedback(note, 0, duration)
+            
 def get_intensity():
     valid_intensities = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     while True:
         try:
             desired_intensity = int(input("Enter desired vibration intensity (0-100): "))
             if 0 <= desired_intensity <= 100:
+                # Find the closest valid intensity
                 closest_intensity = min(valid_intensities, key=lambda x: abs(x - desired_intensity))
                 return closest_intensity
             else:
                 print("Invalid intensity value. Please enter a number between 0 and 100.")
         except ValueError:
             print("Invalid input. Please enter a number.")
-
+            
 def main():
     midi_port_name = 'LoopBe Internal MIDI 0'
-    intensity = get_intensity()
+    intensity = get_intensity()  # Get the desired intensity at the start
     with mido.open_input(midi_port_name) as port:
         print(f"Listening on {midi_port_name}...")
         for message in port:
-            handle_midi_message(message, intensity)
+            handle_midi_message(message, intensity)  # Call the handle_midi_message function with the message and intensity
 
+
+            
+             
 if __name__ == "__main__":
     main()
